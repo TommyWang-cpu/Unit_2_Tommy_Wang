@@ -1,13 +1,54 @@
+
+ArrayList<Float> x1 = new ArrayList<Float> ();
+ArrayList<Float> y1 = new ArrayList<Float> ();
+
+boolean drawShape = false;
+
+
 void setup(){
-size(600,600);
+  size(600,600);
 }
 
 void draw(){
-  monodrone();
-}
-void monodrone(){
+  background(200);
+  City();
+  //monodrone(mouseX,mouseY);
   
-  translate(300,300);
+  if (drawShape){
+    for (int i = 0; i < x1.size(); i++){
+    monodrone(x1.get(i),y1.get(i));
+    }
+  }
+  monodrone(mouseX,mouseY);
+}
+
+void keyPressed(){
+  if (key == ' '){
+  drawShape = true;
+  x1.add((float)mouseX);
+  y1.add((float)mouseY);
+  }
+  if (key == 'c'){
+    clearAll();
+  }
+}
+
+void clearAll(){
+  x1.clear();
+  y1.clear();
+  background(200);
+}
+
+void City(){//The Planes Mechanus
+  circle(150,250,200);
+  circle(30,380,150);
+  circle(100,480,100);
+}
+
+void monodrone(float x,float y){
+  
+  pushMatrix();
+  translate(x,y);
   circle(260-300,270-300,20);
   circle(340-300,270-300,20);
 
@@ -75,6 +116,7 @@ void monodrone(){
 
  fill(0,0,0,0);
  stroke(0);
+ strokeWeight(1);
  //right wing
  //circle(340-300,270-300,20);
  //triangle(340-300,270-300,360-300,260-300,340-300,220-300);
@@ -102,4 +144,5 @@ void monodrone(){
  line(270-300,260-300,280-300,250-300);
  line(280-300,250-300,290-300,270-300);
  circle(285-300,270-300,15);
+ popMatrix();
 }
