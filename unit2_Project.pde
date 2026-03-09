@@ -1,3 +1,47 @@
+class Structure {
+  int type;
+  float x;
+  float y;
+  float rot;
+  
+  Structure(int t, float px, float py, float r){
+    type = t;
+    x = px;
+    y = py;
+    rot = r;
+  }
+  
+  void display(){
+    if(type == 1){
+      pillar1(x,y);
+    }
+    if(type == 2){
+      pillar2(x,y);
+    }
+    if(type == 3){
+      pushMatrix();
+      translate(x,y);
+      rotate(radians(rot));
+      rect(0,0,200,30);
+      popMatrix();
+    }
+  }
+}
+
+ArrayList<Structure> builds = new ArrayList<Structure>();
+
+
+float angle;
+
+color currentColor;
+color targetColor;
+
+float t = 0;  // transition progress
+
+int season = 0; // 0=spring,1=summer,2=autumn,3=winter
+
+int x2,y2;
+
 int f;
 float x1;
 float y1;
@@ -18,11 +62,58 @@ void setup(){
   x1 = 0;
   y1 = 0;
   f = 0;
+  
+  x2 = 300;
+  y2 = 300;
+
+  currentColor = color(0,255,0);   // spring
+  targetColor = color(0,255,0);
+  
 }
 
 void draw(){
+  
   background(200);
+  fill(#05CFF5);
+  rect(0,0,600,400);
+  
+  println(frozenX1,frozenY1, frozenX2,frozenY2, frozenX3,frozenY3,x1,y1);
+  
+  
+  //background(200);
+  
+  season(x2,300);
+
+  x2 += 1;
+  
+  angle += 0.01;
+  planet(300,300);
+
+  if (x2 > 600){
+    x2 = 0;
+    
+    season = (season + 1) % 4;
+    
+    if(season == 0) targetColor = color(0,255,0);     // spring
+    if(season == 1) targetColor = color(0,200,0);     // summer
+    if(season == 2) targetColor = color(255,150,0);   // autumn
+    if(season == 3) targetColor = color(255);         // winter
+    
+    t = 0; // restart transition
+  }
+
+  // smooth color transition
+  currentColor = lerpColor(currentColor, targetColor, 0.02);
+
+  fill(currentColor);
+  rect(0,400,600,200);
+
+  
   house();
+  
+  for(int i = 0; i < builds.size(); i++){
+  builds.get(i).display();
+}
   
   if (draw1){
    pillar1(x1,y1);
@@ -36,12 +127,12 @@ void draw(){
   }
   if (draw4){
    build();
-  // build1();
   }
   if (drawShape){
-   pillar1(frozenX1,frozenY1);
-   draw1 = false;
-  }
+  pillar1(frozenX1,frozenY1);
+  pillar2(frozenX2,frozenY2);
+  pillar3(frozenX3,frozenY3);
+}
 }
 
 void keyPressed(){
@@ -57,10 +148,15 @@ void keyPressed(){
   if (key == 's'){
     y1 = y1+10;
   }
-  if (key == ' '){
-    drawShape = true;
-    frozenX1 = x1;
-    frozenY1 = y1;
+  if(key == ' '){
+  
+  int type = 1;
+  
+  if(draw1) type = 1;
+  if(draw2) type = 2;
+  if(draw3) type = 3;
+  
+  builds.add(new Structure(type, x1, y1, f));
 }
   if (key == '2'){
     draw2 = true;
@@ -86,11 +182,14 @@ void keyPressed(){
     draw4 = true;
   }
   
+  if (key == 'c'){
+    clearAll();
+  }
 }
 
 void house(){
   fill(255);
-  rect(0,400,600,200);//land
+  //rect(0,400,600,200);//land
   
   //3 pillar
   rect(100,300,30,200);
@@ -103,22 +202,19 @@ void house(){
 }
 
 void pillar1(float x,float y){
-  
-  translate(x,y);
   rect(x,y,30,200);
 }
 
 void pillar2(float x,float y){
-  
-  translate(x,y);
   rect(x,y,200,30);
 }
 
 void pillar3(float x,float y){
-  
+  pushMatrix();
   translate(x,y);
-  rotate(f);
-  rect(x,y,200,30);
+  rotate(radians(f));
+  rect(0,0,200,30);
+  popMatrix();
 }
 
 void build(){
@@ -126,12 +222,37 @@ void build(){
   fill(0);
   beginShape();
   vertex(100,300);
-  vertex(x1,y1);
+  vertex(frozenX1,frozenY1);
+  vertex(frozenX2,frozenY2);
+  vertex(frozenX3,frozenY3);
   vertex(530,300);
   endShape();
 }
-//void build1(){
-  //translate(x,y);
-//  fill(0);
-//  rect(100,300,430,200);
-//}
+
+
+void planet (int x,int y){
+  pushMatrix();
+  translate(x,y);
+  rotate(angle);
+  fill(#FFF305);
+  //stroke(#FFA805);
+  //strokeWeight(10);
+  circle(100,300,250); 
+  popMatrix();
+}
+
+void season(int x, int y){
+  pushMatrix();
+  translate(x,y);
+  circle(0,300,50);
+  popMatrix();
+}
+
+void clearAll(){
+  frozenX1 = 0;
+  frozenY1 = 0;
+  frozenX2 = 0;
+  frozenY2 = 0;
+  frozenX3 = 0;
+  background(200);
+}
